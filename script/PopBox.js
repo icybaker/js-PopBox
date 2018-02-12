@@ -1,7 +1,6 @@
 class PopBox {
     constructor(box,initColors,popColors){
-        this.isMobile = this.checkMobile();
-        this.initProps(box,initColors,popColors);
+        this._initProperties(box,initColors,popColors);
         
         this.attachListener(box,"mouseenter",this._ev_enterPop);
         this.attachListener(box,"mouseleave",this._ev_leavePop);
@@ -9,15 +8,10 @@ class PopBox {
         
         this._initStyles(box);
     }
-    checkMobile(){
-        var W = window.innerWidth, H = window.innerHeight;
-        if((W/H)>1){return false;}
-        else{return true;}
-    }
-    initProps(box,iCs,pCs){
-        box.isClicked = false;
-        box.initColors = iCs;
-        box.popColors = pCs;
+    _initProperties(box,initColors,popColors){
+        box.popIsActive = false;
+        box.initColors = initColors;
+        box.popColors = popColors;
     }
     attachListener(element,action,listenerFunction){
         element.addEventListener(action,listenerFunction,false);
@@ -54,12 +48,14 @@ class PopBox {
         if(window.getComputedStyle(element,null).cursor=="auto"){element.style.cursor="default";} 
     }
 
-    static initPopBoxes(selector,{initColors = ["black","white"],popColors = ["white","black"]}={}){
+    static initPopBoxes(selector,{color1 = "black",color2 = "white",backgroundColor1 = "white",backgroundColor2 = "black",initColors = [color1,backgroundColor1],popColors = [color2,backgroundColor2]}={}){
         var boxes = document.querySelectorAll(selector), numBoxes = boxes.length;
         var popBoxes = new Array(numBoxes);
         for(var i=0;i<numBoxes;i++){
             popBoxes[i] = new PopBox(boxes[i],initColors,popColors);
+            popBoxes[i].box = boxes[i];
         }
+        window.PopBoxes = popBoxes;
         return popBoxes;
     }
     static _doc(){
