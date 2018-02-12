@@ -1,5 +1,5 @@
 class PopBox {
-    constructor(box,{initColors = ["black","white"],popColors = ["white","black"]}={}){
+    constructor(box,initColors,popColors){
         this.isMobile = this.checkMobile();
         this.initProps(box,initColors,popColors);
         
@@ -58,7 +58,7 @@ class PopBox {
         var boxes = document.querySelectorAll(selector), numBoxes = boxes.length;
         var popBoxes = new Array(numBoxes);
         for(var i=0;i<numBoxes;i++){
-            popBoxes[i] = new PopBox(boxes[i],{initColors:initColors,popColors:popColors});
+            popBoxes[i] = new PopBox(boxes[i],initColors,popColors);
         }
         return popBoxes;
     }
