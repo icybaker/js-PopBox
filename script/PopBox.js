@@ -2,38 +2,60 @@ class PopBox {
     constructor(box,initColors,popColors){
         this._initProperties(box,initColors,popColors);
         
-        this.attachListener(box,"mouseenter",this._ev_enterPop);
-        this.attachListener(box,"mouseleave",this._ev_leavePop);
-        this.attachListener(box,"click",this._ev_togglePop);
-        
+        PopBox.attachListener(box,"mouseenter",this._ev_pop);
+        PopBox.attachListener(box,"mouseleave",this._ev_unpop);
+        PopBox.attachListener(box,"click",this._ev_latchPop);
+        PopBox.attachListener(box,"click",this._ev_stopPropagation);
+
         this._initStyles(box);
     }
     _initProperties(box,initColors,popColors){
         box.popIsActive = false;
         box.initColors = initColors;
         box.popColors = popColors;
-        box.transform = this._transform;
+        box.popTransform = this._transform;
+        box.popLatched = false; 
+        box.pop = this.pop;
+        box.unpop = this.unpop;
     }
-    attachListener(element,action,listenerFunction){
+    static attachListener(element,action,listenerFunction){
         element.addEventListener(action,listenerFunction,false);
     }
-    _ev_togglePop(evt){
-        var box = evt.currentTarget, isActive = box.popIsActive;
-        box.transform(box,isActive);
+    _ev_pop(evt){
+        var box = evt.currentTarget;
+        if(!box.popLatched){box.pop(box);}
     }
-    _ev_enterPop(evt){
-        var box = evt.currentTarget, isActive = box.popIsActive;
-        if(!isActive){
-            box.style.color = box.popColors[0];
-            box.style.backgroundColor = box.popColors[1];
+    _ev_unpop(evt){
+        var box = evt.currentTarget;
+        if(!box.popLatched){box.unpop(box);}
+    }
+    _ev_latchPop(evt){
+        var box = evt.currentTarget;
+        if(box.popLatched){
+            box.popLatched = false;
+            box.unpop(box);
+        }
+        else{
+            box.popLatched = true;
+            box.pop(box);
         }
     }
-    _ev_leavePop(evt){
-        var box = evt.currentTarget, isActive = box.popIsActive;
-        if(!isActive){
-            box.style.color = box.initColors[0];
-            box.style.backgroundColor = box.initColors[1];
+    _ev_stopPropagation(evt){
+        evt.stopPropagation();
+    }
+    static _ev_unpopAll(evt){
+        var popBoxes = evt.currentTarget.PopBoxes, numboxes = popBoxes.length, box;
+        for(var i=0;i<numboxes;i++){
+            box = popBoxes[i].box;
+            box.popLatched = false;
+            box.unpop(box);
         }
+    }
+    pop(box){
+        box.popTransform(box,false);
+    }
+    unpop(box){
+        box.popTransform(box,true);
     }
     _transform(box,isActive){
         if(isActive){
@@ -60,6 +82,7 @@ class PopBox {
             popBoxes[i].box = boxes[i];
         }
         window.PopBoxes = popBoxes;
+        PopBox.attachListener(window,"click",PopBox._ev_unpopAll);
         return popBoxes;
     }
     static _doc(){
