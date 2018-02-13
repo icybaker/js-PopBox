@@ -47,15 +47,16 @@ class PopBox {
         var popBoxes = evt.currentTarget.PopBoxes, numboxes = popBoxes.length, box;
         for(var i=0;i<numboxes;i++){
             box = popBoxes[i].box;
-            box.popLatched = false;
             box.unpop(box);
         }
+        console.log(popBoxes);
     }
     pop(box){
         box.popTransform(box,false);
     }
     unpop(box){
         box.popTransform(box,true);
+        if(box.popLatched == true){box.popLatched = false;}
     }
     _transform(box,isActive){
         if(isActive){
@@ -77,12 +78,15 @@ class PopBox {
     static initPopBoxes(selector,{color1 = "black",color2 = "white",backgroundColor1 = "white",backgroundColor2 = "black",initColors = [color1,backgroundColor1],popColors = [color2,backgroundColor2]}={}){
         var boxes = document.querySelectorAll(selector), numBoxes = boxes.length;
         var popBoxes = new Array(numBoxes);
+        if(window.PopBoxes == undefined){window.PopBoxes = [];}
         for(var i=0;i<numBoxes;i++){
             popBoxes[i] = new PopBox(boxes[i],initColors,popColors);
             popBoxes[i].box = boxes[i];
+            window.PopBoxes.push(popBoxes[i]);
+            
         }
-        window.PopBoxes = popBoxes;
-        PopBox.attachListener(window,"click",PopBox._ev_unpopAll);
+        if(window.PopBoxes.listenerAttached == undefined){PopBox.attachListener(window,"click",PopBox._ev_unpopAll);}
+        window.PopBoxes.listenerAttached = true;
         return popBoxes;
     }
     static _doc(){
