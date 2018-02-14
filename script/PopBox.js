@@ -85,8 +85,10 @@ class PopBox {
             window.PopBoxes.push(popBoxes[i]);
             
         }
-        if(window.PopBoxes.listenerAttached == undefined){PopBox.attachListener(window,"click",PopBox._ev_unpopAll);}
-        window.PopBoxes.listenerAttached = true;
+        if(window.PopBoxes.listenerAttached == undefined){
+            PopBox.attachListener(window,"click",PopBox._ev_unpopAll);
+            window.PopBoxes.listenerAttached = true;
+        }
         return popBoxes;
     }
     static _doc(){
