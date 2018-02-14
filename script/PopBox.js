@@ -49,7 +49,6 @@ class PopBox {
             box = popBoxes[i].box;
             box.unpop(box);
         }
-        console.log(popBoxes);
     }
     pop(box){
         box.popTransform(box,false);
